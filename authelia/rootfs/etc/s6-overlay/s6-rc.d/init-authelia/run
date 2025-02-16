@@ -5,13 +5,17 @@
 # Configures Authelia before running
 # ==============================================================================
 
-bashio::log.info "Initializing Authelia environment variables..."
+bashio::log.debug "Initializing Authelia environment variables..."
 
 # Set environment variables
 export AUTHELIA_SERVER_ADDRESS="tcp://:9091"
 export AUTHELIA_STORAGE_LOCAL_PATH="/data/db.sqlite3"
 
-bashio::log.info "Starting Authelia configuration check..."
+# Log the values of the environment variables
+bashio::log.debug "AUTHELIA_SERVER_ADDRESS set to: ${AUTHELIA_SERVER_ADDRESS}"
+bashio::log.debug "AUTHELIA_STORAGE_LOCAL_PATH set to: ${AUTHELIA_STORAGE_LOCAL_PATH}"
+
+bashio::log.debug "Starting Authelia configuration check..."
 
 # Define paths
 CONFIG_FILE="/config/config.yml"
@@ -38,5 +42,5 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
         exit 1  # Exit due to missing template
     fi
 else
-    bashio::log.info "Existing configuration found at '$CONFIG_FILE'. Continuing startup..."
+    bashio::log.debug "Existing configuration found at '$CONFIG_FILE'. Continuing startup..."
 fi
