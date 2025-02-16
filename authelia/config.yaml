@@ -1,0 +1,20 @@
+---
+name: "Authelia"
+version: "dev"
+slug: "authelia"
+description: Authelia - Authentication and Authorization Server
+url: "https://github.com/einschmidt/addon-authelia"
+arch:
+  - amd64
+  - aarch64
+init: false
+ports:
+  9091/tcp: 9091
+ports_description:
+  9091/tcp: "Authelia Web UI and API"
+map:
+  - addon_config:rw
+options:
+  log_level: "info"
+schema:
+  log_level: "list(debug|info|warn|error)"
