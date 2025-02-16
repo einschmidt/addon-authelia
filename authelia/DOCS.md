@@ -26,15 +26,38 @@ The add-on requires a **configuration file (`config.yml`)** to function properly
 ### Example Configuration (`config.yml`):
 
 ```yaml
+###############################################################
+#                Authelia minimal configuration               #
+###############################################################
+port: 9091
+logs_level: info
+jwt_secret: insecure_secret
 authentication_backend:
   file:
-    path: "/config/users.yml"
-
+    path: /config/users.yml
+totp:
+  issuer: example.com
+session:
+  secret: insecure_session_secret
+  domain: example.com
+  expiration: 3600 # 1 hour
+  inactivity: 300 # 5 minutes
+  redis:
+    host: redis
+    port: 6379
+storage:
+  local:
+    path: /data/db.sqlite
 access_control:
-  default_policy: deny
+  default_policy: bypass
   rules:
-    - domain: "example.com"
+    - domain: "public.example.com"
+      policy: bypass
+    - domain: "traefik.example.com"
       policy: one_factor
+notifier:
+  filesystem:
+    filename: /config/emails.txt
 ```
 
 After the first startup, edit the generated file at /config/config.yml with your settings.
