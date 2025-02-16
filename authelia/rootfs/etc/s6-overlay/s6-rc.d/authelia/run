@@ -7,15 +7,9 @@
 
 bashio::log.info 'Starting authelia...'
 
-# Debug: Find all files named "authelia" in the container to ensure it was downloaded and moved properly
-bashio::log.info 'Searching for authelia binary...'
-find / -name 'authelia' 2>/dev/null
-
 # Check if authelia binary exists
 if [ -f /usr/bin/authelia ]; then
-    bashio::log.info 'Authelia binary found!'
-    ls -l /usr/bin/authelia
-    ldd /usr/bin/authelia
+    bashio::log.debug 'Authelia binary found!'
 else
     bashio::log.error 'Authelia binary not found at /usr/bin/authelia'
     exit 1
@@ -23,16 +17,12 @@ fi
 
 # Check if the configuration file exists
 if [ -f /etc/authelia/config.template.yml ]; then
-    bashio::log.info 'Configuration file found!'
+    bashio::log.debug 'Configuration file found!'
 else
     bashio::log.error 'Configuration file not found at /etc/authelia/config.template.yml'
     exit 1
 fi
 
-# Debug: List /etc/authelia to check if the configuration was moved
-bashio::log.info 'Listing /etc/authelia to check for config files...'
-ls -l /etc/authelia
-
 # Run authelia
-bashio::log.info 'Running authelia...'
+bashio::log.debug 'Running authelia...'
 exec /usr/bin/authelia --config /config/config.yml
