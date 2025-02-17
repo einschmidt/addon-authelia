@@ -14,10 +14,9 @@ authentication_backend:
     path: /config/users.yml
 
 session:
-  domain: {{ .domain }}
-  expiration: 3600  # 1 hour
-  inactivity: 300  # 5 minutes
-  remember_me_duration: 1y
+  cookies:
+    - domain: {{ .domain }}
+      authelia_url: "https://authelia.{{ .domain }}"
 
 notifier:
   filesystem:

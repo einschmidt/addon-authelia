@@ -34,7 +34,7 @@ RUN \
 COPY rootfs /
 
 # Set environment variables
-ENV AUTHELIA_SERVER_ADDRESS="tcp://localhost:9091"
+ENV AUTHELIA_SERVER_ADDRESS="tcp://:9091"
 ENV AUTHELIA_STORAGE_LOCAL_PATH="/data/db.sqlite3"
 ENV AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE="/config/secrets/jwt_secret"
 ENV AUTHELIA_SESSION_SECRET_FILE="/config/secrets/session_secret"
