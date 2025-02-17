@@ -40,7 +40,7 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     bashio::log.debug "configuration.yml generated successfully."
 
     # Use template to generate users.yml
-    
+
     bashio::log.debug "Generating users.yml..."
     bashio::var.json \
         domain "$domain" \
@@ -55,7 +55,6 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     if [[ ! -f "$JWT_SECRET_FILE" ]]; then
         bashio::log.debug "JWT secret not found. Generating a new one..."
         if authelia crypto rand --length 64 --charset ascii --file "$JWT_SECRET_FILE"; then
-            chmod 600 "$JWT_SECRET_FILE"
             export AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE="$JWT_SECRET_FILE"
             bashio::log.info "JWT secret generated and stored at $JWT_SECRET_FILE."
         else
@@ -71,7 +70,6 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     if [[ ! -f "$SESSION_SECRET_FILE" ]]; then
         bashio::log.debug "Session secret not found. Generating a new one..."
         if authelia crypto rand --length 64 --charset ascii --file "$SESSION_SECRET_FILE"; then
-            chmod 600 "$SESSION_SECRET_FILE"
             export AUTHELIA_SESSION_SECRET_FILE="$SESSION_SECRET_FILE"
             bashio::log.info "Session secret generated and stored at $SESSION_SECRET_FILE."
         else
@@ -87,7 +85,6 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     if [[ ! -f "$STORAGE_SECRET_FILE" ]]; then
         bashio::log.debug "Storage encryption key not found. Generating a new one..."
         if authelia crypto rand --length 64 --charset ascii --file "$STORAGE_SECRET_FILE"; then
-            chmod 600 "$STORAGE_SECRET_FILE"
             export AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE="$STORAGE_SECRET_FILE"
             bashio::log.info "Storage encryption key generated and stored at $STORAGE_SECRET_FILE."
         else
