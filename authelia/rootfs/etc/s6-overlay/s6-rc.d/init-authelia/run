@@ -26,15 +26,15 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     
     # Generating secrets
     bashio::log.debug "Generating JWT secret..."
-    jwt_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    jwt_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
     bashio::log.debug "JWT secret generated successfully."
 
     bashio::log.debug "Generating Session secret..."
-    session_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    session_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
     bashio::log.debug "Session secret generated successfully."
 
     bashio::log.debug "Generating Storage secret..."
-    storage_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    storage_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
     bashio::log.debug "Storage secret generated successfully."
 
     # Debugging generated secrets (Masked for security)
