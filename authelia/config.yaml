@@ -2,7 +2,7 @@
 name: "Authelia"
 version: "dev"
 slug: "authelia"
-description: Authelia - Authentication and Authorization Server
+description: Authentication and Authorization Server
 url: "https://github.com/einschmidt/addon-authelia"
 arch:
   - amd64
