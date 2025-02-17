@@ -19,28 +19,52 @@ bashio::log.debug "Starting Authelia configuration check..."
 
 # Define paths
 CONFIG_FILE="/config/config.yml"
-TEMPLATE_FILE="/etc/authelia/config.template.yml"
 
 # Ensure configuration exists
 if ! bashio::fs.file_exists "$CONFIG_FILE"; then
-    bashio::log.warning "Configuration file '$CONFIG_FILE' not found!"
+    bashio::log.warning "Configuration file missing, start scaffolding..."
     
-    if bashio::fs.file_exists "$TEMPLATE_FILE"; then
-        bashio::log.info "Copying template configuration from '$TEMPLATE_FILE' to '$CONFIG_FILE'..."
-        cp "$TEMPLATE_FILE" "$CONFIG_FILE"
-        
-        if [[ $? -eq 0 ]]; then
-            bashio::log.info "Configuration file successfully created at '$CONFIG_FILE'."
-            bashio::log.warning "Please edit '$CONFIG_FILE' with your settings before restarting."
-            exit 1  # Exit to indicate the first-time setup
-        else
-            bashio::log.error "Failed to copy the template configuration file!"
-            exit 1  # Exit due to an error
-        fi
-    else
-        bashio::log.error "Template configuration file '$TEMPLATE_FILE' not found!"
-        exit 1  # Exit due to missing template
-    fi
+    # Generating secrets
+    bashio::log.debug "Generating JWT secret..."
+    jwt_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    bashio::log.debug "JWT secret generated successfully."
+
+    bashio::log.debug "Generating Session secret..."
+    session_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    bashio::log.debug "Session secret generated successfully."
+
+    bashio::log.debug "Generating Storage secret..."
+    storage_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric | sed 's/Random Password: //g')
+    bashio::log.debug "Storage secret generated successfully."
+
+    # Debugging generated secrets (Masked for security)
+    bashio::log.debug "Generated secrets (masked): JWT=${jwt_secret:0:6}..., Session=${session_secret:0:6}..., Storage=${storage_secret:0:6}..."
+
+    # Fetching domain from configuration
+    domain="$(bashio::config 'domain')"
+    bashio::log.debug "Retrieved domain from config: $domain"
+
+    # Use template to generate configuration.yml
+    bashio::log.debug "Generating configuration.yml..."
+    bashio::var.json \
+        jwt_secret "$jwt_secret" \
+        session_secret "$session_secret" \
+        storage_secret "$storage_secret" \
+        domain "$domain" \
+        | tempio \
+            -template /etc/s6-overlay/s6-rc.d/init-authelia/config.gtpl \
+            -out /config/config.yml
+    bashio::log.debug "configuration.yml generated successfully."
+
+    # Use template to generate users.yml
+    bashio::log.debug "Generating users.yml..."
+    bashio::var.json \
+        domain "$domain" \
+        | tempio \
+            -template /etc/s6-overlay/s6-rc.d/init-authelia/users.gtpl \
+            -out /config/users.yml
+    bashio::log.debug "users.yml generated successfully."
+
 else
     bashio::log.debug "Existing configuration found at '$CONFIG_FILE'. Continuing startup..."
 fi
