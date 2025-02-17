@@ -8,10 +8,12 @@
 bashio::log.debug "Initializing Authelia environment variables..."
 
 # Set environment variables
+
 export AUTHELIA_SERVER_ADDRESS="tcp://:9091"
 export AUTHELIA_STORAGE_LOCAL_PATH="/data/db.sqlite3"
 
 # Log the values of the environment variables
+
 bashio::log.debug "AUTHELIA_SERVER_ADDRESS set to: ${AUTHELIA_SERVER_ADDRESS}"
 bashio::log.debug "AUTHELIA_STORAGE_LOCAL_PATH set to: ${AUTHELIA_STORAGE_LOCAL_PATH}"
 
@@ -23,22 +25,6 @@ CONFIG_FILE="/config/config.yml"
 # Ensure configuration exists
 if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     bashio::log.warning "Configuration file missing, start scaffolding..."
-    
-    # Generating secrets
-    bashio::log.debug "Generating JWT secret..."
-    jwt_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
-    bashio::log.debug "JWT secret generated successfully."
-
-    bashio::log.debug "Generating Session secret..."
-    session_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
-    bashio::log.debug "Session secret generated successfully."
-
-    bashio::log.debug "Generating Storage secret..."
-    storage_secret=$(authelia crypto hash generate argon2 --random --random.length 64 --random.charset alphanumeric --no-confirm | sed 's/Random Password: //g')
-    bashio::log.debug "Storage secret generated successfully."
-
-    # Debugging generated secrets (Masked for security)
-    bashio::log.debug "Generated secrets (masked): JWT=${jwt_secret:0:6}..., Session=${session_secret:0:6}..., Storage=${storage_secret:0:6}..."
 
     # Fetching domain from configuration
     domain="$(bashio::config 'domain')"
@@ -47,9 +33,6 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     # Use template to generate configuration.yml
     bashio::log.debug "Generating configuration.yml..."
     bashio::var.json \
-        jwt_secret "$jwt_secret" \
-        session_secret "$session_secret" \
-        storage_secret "$storage_secret" \
         domain "$domain" \
         | tempio \
             -template /etc/s6-overlay/s6-rc.d/init-authelia/config.gtpl \
@@ -57,6 +40,7 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
     bashio::log.debug "configuration.yml generated successfully."
 
     # Use template to generate users.yml
+    
     bashio::log.debug "Generating users.yml..."
     bashio::var.json \
         domain "$domain" \
@@ -64,6 +48,56 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
             -template /etc/s6-overlay/s6-rc.d/init-authelia/users.gtpl \
             -out /config/users.yml
     bashio::log.debug "users.yml generated successfully."
+
+    # Generate secrets
+
+    JWT_SECRET_FILE="/config/secrets/jwt_secret"
+    if [[ ! -f "$JWT_SECRET_FILE" ]]; then
+        bashio::log.debug "JWT secret not found. Generating a new one..."
+        if authelia crypto rand --length 64 --charset ascii --file "$JWT_SECRET_FILE"; then
+            chmod 600 "$JWT_SECRET_FILE"
+            export AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE="$JWT_SECRET_FILE"
+            bashio::log.info "JWT secret generated and stored at $JWT_SECRET_FILE."
+        else
+            bashio::log.error "Failed to generate JWT secret!"
+            exit 1
+        fi
+    else
+        bashio::log.debug "JWT secret already exists at $JWT_SECRET_FILE. Skipping generation."
+        export AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE="$JWT_SECRET_FILE"
+    fi
+
+    SESSION_SECRET_FILE="/config/secrets/session_secret"
+    if [[ ! -f "$SESSION_SECRET_FILE" ]]; then
+        bashio::log.debug "Session secret not found. Generating a new one..."
+        if authelia crypto rand --length 64 --charset ascii --file "$SESSION_SECRET_FILE"; then
+            chmod 600 "$SESSION_SECRET_FILE"
+            export AUTHELIA_SESSION_SECRET_FILE="$SESSION_SECRET_FILE"
+            bashio::log.info "Session secret generated and stored at $SESSION_SECRET_FILE."
+        else
+            bashio::log.error "Failed to generate Session secret!"
+            exit 1
+        fi
+    else
+        bashio::log.debug "Session secret already exists at $SESSION_SECRET_FILE. Skipping generation."
+        export AUTHELIA_SESSION_SECRET_FILE="$SESSION_SECRET_FILE"
+    fi
+
+    STORAGE_SECRET_FILE="/config/secrets/storage_encryption_key"
+    if [[ ! -f "$STORAGE_SECRET_FILE" ]]; then
+        bashio::log.debug "Storage encryption key not found. Generating a new one..."
+        if authelia crypto rand --length 64 --charset ascii --file "$STORAGE_SECRET_FILE"; then
+            chmod 600 "$STORAGE_SECRET_FILE"
+            export AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE="$STORAGE_SECRET_FILE"
+            bashio::log.info "Storage encryption key generated and stored at $STORAGE_SECRET_FILE."
+        else
+            bashio::log.error "Failed to generate Storage encryption key!"
+            exit 1
+        fi
+    else
+        bashio::log.debug "Storage encryption key already exists at $STORAGE_SECRET_FILE. Skipping generation."
+        export AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE="$STORAGE_SECRET_FILE"
+    fi
 
 else
     bashio::log.debug "Existing configuration found at '$CONFIG_FILE'. Continuing startup..."
