@@ -21,61 +21,32 @@ This add-on supports the following architectures:
 
 ## Configuration
 
-The add-on requires a **configuration file (`config.yml`)** to function properly. If one is not found, a **template will be created automatically** during the first startup.
+Before launching the add-on for the first time, you **must edit the `domain`** option in the configuration. This is a critical step, as it ensures Authelia is set up with your specific domain for proper functionality.
 
-### Example Configuration (`config.yml`):
+### Steps for Configuration
 
-```yaml
-###############################################################
-#                Authelia minimal configuration               #
-###############################################################
-port: 9091
-logs_level: info
-jwt_secret: insecure_secret
-authentication_backend:
-  file:
-    path: /config/users.yml
-totp:
-  issuer: example.com
-session:
-  secret: insecure_session_secret
-  domain: example.com
-  expiration: 3600 # 1 hour
-  inactivity: 300 # 5 minutes
-  redis:
-    host: redis
-    port: 6379
-storage:
-  local:
-    path: /data/db.sqlite
-access_control:
-  default_policy: bypass
-  rules:
-    - domain: "public.example.com"
-      policy: bypass
-    - domain: "traefik.example.com"
-      policy: one_factor
-notifier:
-  filesystem:
-    filename: /config/emails.txt
-```
+1. **Edit the Domain**  
+   The `domain` option must be set before the first launch. This option is essential for properly routing requests and configuring session cookies.
+   - Example:
+     ```yaml
+     domain: yourdomain.com
+     ```
 
-After the first startup, edit the generated file at /config/config.yml with your settings.
+2. **First Launch**  
+   Upon first launch, the add-on will automatically create the `config.yml` file in the `addon_config` folder. This file will be populated with the default settings, including the configured domain and other required settings.
 
-The following environment variables are set automatically:
+3. **Edit the Generated `config.yml`**  
+   After the first launch, you will find the `config.yml` file in the `/addon_config` folder. **You must edit this file to match your personal environment**. Ensure that all necessary settings, such as domain, user authentication paths, and other relevant options, are correctly configured.
 
-- **`AUTHELIA_SERVER_ADDRESS`** (Default: `tcp://:9091`)
+4. **Relaunch the Add-on**  
+   After making any edits to the `config.yml` file, **you must restart the add-on** for the changes to take effect. This step is crucial to ensure the proper application of the updated configuration.
 
-  - The address where Authelia listens.
+### Important Notes
 
-- **`AUTHELIA_STORAGE_LOCAL_PATH`** (Default: `/data/db.sqlite3`)
-  - Path to the local SQLite database.
+- The **`domain`** setting is required for the initial config creation only.
+- Any changes to `config.yml` after the initial launch require a **relaunch of the add-on** to apply the new settings.
 
-## First-Time Setup
-
-    •	If no config.yml exists, a default template will be copied to /config/config.yml.
-    •	The add-on will exit with an error to prompt you to update the configuration.
-    •	After modifying config.yml, restart the add-on.
+Please make sure to carefully review and customize the `config.yml` before proceeding to ensure optimal operation.
 
 ## More Information
 
