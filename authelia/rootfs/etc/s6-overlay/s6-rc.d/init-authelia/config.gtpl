@@ -49,7 +49,7 @@ session:
   cookies:
     - domain: {{ .domain }}  # Domain where cookies will be set
       authelia_url: "https://authelia.{{ .domain }}"  # Authelia service URL
-      default_redirection_url: "https://{{ .domain }} # Redirection URL
+      default_redirection_url: "https://{{ .domain }}" # Redirection URL
 
 # Notifications
 notifier:
