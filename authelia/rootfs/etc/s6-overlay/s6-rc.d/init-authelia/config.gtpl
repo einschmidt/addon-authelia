@@ -33,24 +33,30 @@
 # - Keeping secrets and critical paths in environment variables improves security.
 #################################################################
 
+# Misc
 log:
   level: info  # Logging level (info, debug, warn, error)
 
 theme: auto  # UI theme (auto, light, dark)
 
+# First Factor
 authentication_backend:
   file:
     path: /config/users.yml  # Path to the user credentials file
 
+# Session
 session:
   cookies:
     - domain: {{ .domain }}  # Domain where cookies will be set
       authelia_url: "https://authelia.{{ .domain }}"  # Authelia service URL
+      default_redirection_url: "https://{{ .domain }} # Redirection URL
 
+# Notifications
 notifier:
   filesystem:
     filename: /config/emails.txt  # Location where notification emails are stored
 
+# Security
 access_control:
   default_policy: deny  # Default policy (deny all unless specified)
   rules:
