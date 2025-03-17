@@ -18,7 +18,7 @@ RUN \
   && if [ "${BUILD_ARCH}" = "armv7" ] || [ "${BUILD_ARCH}" = "armhf" ]; then BINARCH="arm"; BINARY_NAME="authelia-linux-arm"; fi \
   \
   && mkdir -p /tmp/authelia /etc/authelia \
-  && curl -J -L -o /tmp/authelia.tar.gz "https://github.com/authelia/authelia/releases/download/${AUTHELIA_VERSION}/authelia-${AUTHELIA_VERSION}-linux-${BINARCH}-musl.tar.gz" \
+  && curl -J -L -o /tmp/authelia.tar.gz "https://github.com/authelia/authelia/releases/download/${AUTHELIA_VERSION}/authelia-${AUTHELIA_VERSION}-linux-${BINARCH}.tar.gz" \
   \
   && tar zxvf /tmp/authelia.tar.gz -C /tmp/authelia \
   \
