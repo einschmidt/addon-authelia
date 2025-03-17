@@ -90,3 +90,7 @@ if ! bashio::fs.file_exists "$CONFIG_FILE"; then
 else
     bashio::log.debug "Existing configuration found at '$CONFIG_FILE'. Continuing startup..."
 fi
+
+# Validate authelia config
+bashio::log.debug 'Validate authelia config...'
+exec /usr/bin/authelia validate-config --config /config/config.yml
