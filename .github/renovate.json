@@ -28,7 +28,7 @@
         "/Dockerfile$"
       ],
       "matchStrings": [
-        "ENV AUTHELA_VERSION=[\"']?(?<currentValue>v[\\d.]+)[\"']?"
+        "ENV AUTHELIA_VERSION=[\"']?(?<currentValue>v[\\d.]+)[\"']?"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "authelia/authelia"
