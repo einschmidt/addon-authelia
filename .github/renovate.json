@@ -11,7 +11,7 @@
       "matchStringsStrategy": "any",
       "matchStrings": [
         "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\s+",
-        "(aarch64|amd64|armhf|armv7|i386):\\s[\"']?(?<depName>.*?):(?<currentValue>.*?)[\"']?\\s"
+        "ENV AUTHELIA_VERSION=[\"']?(?<currentValue>v[0-9\\.]+)[\"']?"
       ],
       "datasourceTemplate": "docker"
     },
