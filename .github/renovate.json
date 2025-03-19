@@ -12,7 +12,7 @@
       "matchStringsStrategy": "any",
       "matchStrings": [
         "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\s+",
-        "ENV AUTHELIA_VERSION=[\"']?(?<currentValue>v[0-9\\.]+)[\"']?"
+        "(aarch64|amd64|armhf|armv7|i386):\\s[\"']?(?<depName>.*?):(?<currentValue>.*?)[\"']?\\s"
       ],
       "datasourceTemplate": "docker"
     },
@@ -24,17 +24,6 @@
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "authelia/authelia"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["/Dockerfile$"],
-      "matchStringsStrategy": "any",
-      "matchStrings": [
-        "\\s\\s(?<package>[a-z0-9-]+)=(?<currentValue>[a-z0-9-_.]+)\\s+"
-      ],
-      "versioningTemplate": "loose",
-      "datasourceTemplate": "repology",
-      "depNameTemplate": "alpine_3_21/{{package}}"
     }
   ],
   "packageRules": [
