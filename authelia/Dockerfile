@@ -13,9 +13,9 @@ ARG BUILD_ARCH=amd64
 RUN \
   set -eux \
   && BINARCH="${BUILD_ARCH}" \
-  && BINARY_NAME="authelia-linux-${BUILD_ARCH}" \
-  && if [ "${BUILD_ARCH}" = "aarch64" ]; then BINARCH="arm64"; BINARY_NAME="authelia-linux-arm64"; fi \
-  && if [ "${BUILD_ARCH}" = "armv7" ] || [ "${BUILD_ARCH}" = "armhf" ]; then BINARCH="arm"; BINARY_NAME="authelia-linux-arm"; fi \
+  && BINARY_NAME="authelia" \
+  && if [ "${BUILD_ARCH}" = "aarch64" ]; then BINARCH="arm64"; BINARY_NAME="authelia"; fi \
+  && if [ "${BUILD_ARCH}" = "armv7" ] || [ "${BUILD_ARCH}" = "armhf" ]; then BINARCH="arm"; BINARY_NAME="authelia"; fi \
   \
   && mkdir -p /tmp/authelia /etc/authelia \
   && curl -J -L -o /tmp/authelia.tar.gz "https://github.com/authelia/authelia/releases/download/${AUTHELIA_VERSION}/authelia-${AUTHELIA_VERSION}-linux-${BINARCH}.tar.gz" \
